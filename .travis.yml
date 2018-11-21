@@ -1,0 +1,11 @@
+language: node_js
+node_js: node
+services:
+- mongodb
+deploy:
+  provider: heroku
+  api_key:
+    secure: UADxX3cZi2uuZwdYCeqJCs6HsG/2gB66wbfm0mZ8flGne32vMXK5w+r+Pz7VFhq/daDpbuS4XOg0IE+EiBDtyEx5vS8coLaNaFU5tq02dERHNmQ0LvKU5qLWKMKv8Qaz5X+N4RHYWzlQAPI8CnFfu25bJ+/iMb545iK6KaYMJ+FmaCOHP2EUGkMabYw4wsNzsf3qfPzfwIJ+3SZEWF5xmOC/nrFDHnZCiAt3avCtk+GmPKOl6C+VTG3vF4KPFIUv6etSpf2UBGN+uTNxOo4koJVk/J/qC9pVyUAL7py5J8zC8XlkDpqESK0/VBMjiqSIuDrArjoQYAEAMhzmCxMedz80LizJNeWfMdSibHjOKxQHe76Z7ULVVfYm8yzBXzQniR50GK1n7Jj+6nOMj3EL+ner3Q0Kxiqk1LkI9vbkpv/nPStZxpoQncipJk/WhwhnUJ/Tlfvk/bTc7We7LJuOSHdV5DMLizLRz6EnaBSq9+TM1JX0wpLkn8jnPyaPtYGWqMjxLZR2ZwMcImfH5WRPisyecdsLZ/n18cw6QNr0L4LmPr5Q7xzd9jUEb7W0XaQncHW69N9EjCajFmQwMvmx0cIz9goJQHHjADc3Npy/1DTiDP2VvP4ELMTQiSt0iHj2FIGyBDSsaOLqHMOc5Y8oYOC2J+Ufd0URHkPsSJ/gidQ=
+  app: dry-ravine-94147
+  on:
+    repo: ASiede/ourtinerary-api
