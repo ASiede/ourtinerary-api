@@ -5,6 +5,17 @@ const mongoose = require("mongoose");
 
 mongoose.Promise = global.Promise;
 
+const itineraryItemSchema = mongoose.Schema({
+    type: {type: String},
+    name: {type: String, required: true},
+    confirmed: {type: Boolean},
+    price: {type: String},
+    location: {type: String},
+    website: {type: String},
+    ////errrrrr
+    votes: {type:String}
+});
+
 const tripSchema = mongoose.Schema({
     name: {
       type: String,
@@ -17,10 +28,10 @@ const tripSchema = mongoose.Schema({
     location: {
       type: String
     },
-    tripLeader: {type: mongoose.Schema.Types.ObjectId: 'User'},
-    collaborators:[{type: mongoose.Schema.Types.ObjectId: 'User'}],
+    tripLeader: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
+    collaborators:[{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
     itineraryItems:[itineraryItemSchema]
-)};
+});
 
 const userSchema = mongoose.Schema({
     username: {
@@ -34,20 +45,8 @@ const userSchema = mongoose.Schema({
     },
     firstName: {type: String},
     lastName: {type: String},
-    trips:[{type: mongoose.Schema.Types.ObjectId: 'Trip'}]
+    // trips:[{type: mongoose.Schema.Types.ObjectId, ref: 'Trip'}]
 });
-
-
-const itineraryItemSchema = mongoose.Schema({
-    type: {type: String},
-    name: {type: String, required: true},
-    confirmed: {type: boolean},
-    price: {type: String},
-    location: {type: String},
-    website: {type: String},
-    ////errrrrr
-    votes:
-})
 
 tripSchema.methods.serialize = function() {
     return {
@@ -68,7 +67,7 @@ userSchema.methods.serialize = function() {
         password: this.password,
         firstName: this.firstName,
         lastName: this.lastName,
-        tripsById: this.tripsById
+        // tripsById: this.tripsById
     };
 };
 
@@ -85,13 +84,13 @@ itineraryItemSchema.methods.serialize = function() {
     }
 }
 
-// userSchema.methods.validatePassword = function(password) {
-//   return bcrypt.compare(password, this.password);
-// };
+userSchema.methods.validatePassword = function(password) {
+  return bcrypt.compare(password, this.password);
+};
 
-// userSchema.statics.hashPassword = function(password) {
-//   return bcrypt.hash(password, 10);
-// };
+userSchema.statics.hashPassword = function(password) {
+  return bcrypt.hash(password, 10);
+};
 
 
 const Trip = mongoose.model("Trip", tripSchema);
