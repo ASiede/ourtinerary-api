@@ -42,10 +42,33 @@ app.use('/auth/', authRouter);
 //include this as middleware for anything for which you must be an authorized user
 const jwtAuth = passport.authenticate('jwt', { session: false });
 
+//GET endpoint for trips
 
-app.get('/api/*', (req, res) => {
-	res.json({ok: true});
+app.get('/trips', (req, res) => {
+	Trip
+		.find()
+		.populate('tripLeader')
+		.populate('collaborators')
+		.then(trips => {
+			res.json({
+				trips: trips.map(trip => trip.serialize())
+			});
+		})
+		.catch(err => {
+			console.error(err);
+			res.status(500).json({message: "Internal server error"});
+		});
 });
+//GET endpoint for trips by id
+//POST endpoint for new trips
+//PUT endpoint for updating existing trips (by id)
+//DELETE endpoint for deleting existing trips (by id)
+
+//GET endpoint for itinerary items
+//GET endpoint for itinerary items by id
+//POST endpoint for new itinerary items
+//PUT endpoint for updating existing itinerary items (by id)
+//DELETE endpoint for deleting existing itinerary items (by id)
 
 
 //Server setup

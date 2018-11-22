@@ -16,23 +16,6 @@ const itineraryItemSchema = mongoose.Schema({
     votes: {type:String}
 });
 
-const tripSchema = mongoose.Schema({
-    name: {
-      type: String,
-      required: true
-    },
-    dates: {
-      type: Date,
-      required: false
-    },
-    location: {
-      type: String
-    },
-    tripLeader: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
-    collaborators:[{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
-    itineraryItems:[itineraryItemSchema]
-});
-
 const userSchema = mongoose.Schema({
     username: {
       type: String,
@@ -43,22 +26,29 @@ const userSchema = mongoose.Schema({
       type: String,
       required: true
     },
-    firstName: {type: String},
-    lastName: {type: String},
-    // trips:[{type: mongoose.Schema.Types.ObjectId, ref: 'Trip'}]
+    firstName: {type: String, default: ""},
+    lastName: {type: String, default: ""},
+    trips:[{type: mongoose.Schema.Types.ObjectId, ref: 'Trip'}]
 });
 
-tripSchema.methods.serialize = function() {
-    return {
-        id: this._id,
-        name: this.name,
-        dates: this.dates,
-        location: this.location,
-        tripLeader: this.tripLeader,
-        collaborators: this.collaborators,
-        itineraryItems: this.itineraryItems
-    };  
-};
+const tripSchema = mongoose.Schema({
+    name: {
+      type: String,
+      required: true
+    },
+    dates: {
+      type: String,
+      required: false
+    },
+    location: {
+      type: String
+    },
+    tripLeader: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
+    collaborators:[{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
+    itineraryItems:[itineraryItemSchema]
+});
+
+
 
 userSchema.methods.serialize = function() {
     return {
@@ -67,9 +57,30 @@ userSchema.methods.serialize = function() {
         password: this.password,
         firstName: this.firstName,
         lastName: this.lastName,
-        // tripsById: this.tripsById
+        tripsById: this.trips
     };
 };
+
+tripSchema.virtual('tripLeaderUsername').get(function() {
+  return `${this.tripLeader.username}`
+})
+
+tripSchema.virtual('collaboratorUsernames').get(function() {
+  return this.collaborators.map(collaborator => `${collaborator.username}`)
+})
+
+tripSchema.methods.serialize = function() {
+    return {
+        id: this._id,
+        name: this.name,
+        dates: this.dates,
+        location: this.location,
+        tripLeader: this.tripLeaderUsername,
+        collaborators: this.collaboratorUsernames,
+        itineraryItems: this.itineraryItems
+    };  
+};
+
 
 itineraryItemSchema.methods.serialize = function() {
     return {

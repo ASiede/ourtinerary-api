@@ -1,7 +1,8 @@
-{
-	"_id": "5b958af16bfe8fba53fb5fc6",
-	"username": "Alyssa",
-	"firstName": "Alyssa",
-	"lastName": "Edwards",
-	"password": "passwordpassword"
-}
+
+	{
+		"_id": "4b958af16bfe8fba53fb5fc6",
+		"username": "Rupaul",
+		"password": "passwordpassword",
+		"tripsById": ["4c958af16bfe8fba53fb5fc6", "4b758af16bfe8fba53fb5fc6", "4b658af16bfe8fba53fb5fc6"]
+	}
+	

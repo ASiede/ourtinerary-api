@@ -9,7 +9,7 @@ const {Trip, User, ItineraryItem} = require('../models');
 const {app, runServer, closeServer} = require('../server');
 const {TEST_DATABASE_URL} = require('../config');
 
-// const seedTrips = require('../db/trips');
+const seedTrips = require('../db/trips');
 const seedUsers = require('../db/users');
 
 chai.use(chaiHttp);
@@ -21,10 +21,10 @@ passport.use(jwtStrategy);
 const jwtAuth = passport.authenticate('jwt', { session: false });
 
 // //Setting up for seeding trip data
-// function seedTripData() {
-// 	console.info('seeding trip data');
-// 	return Trip.insertMany(seedTrips);
-// }
+function seedTripData() {
+	console.info('seeding trip data');
+	return Trip.insertMany(seedTrips);
+}
 //Seeding user data
 function seedUserData() {
 	console.info('seeding user data');
@@ -43,9 +43,9 @@ describe('API', function() {
 	return runServer(TEST_DATABASE_URL);
 	});
 
-	// beforeEach(function() {
-	// return seedTripData();
-	// });
+	beforeEach(function() {
+	return seedTripData();
+	});
 
 	beforeEach(function() {
 	return seedUserData();
@@ -59,63 +59,56 @@ describe('API', function() {
 	return closeServer();
 	});	
 
-	// GET endpoint for trips
+	//GET endpoint for trips
 	describe('GET endpoint', function() {
 
-		it('should 200 on GET requests', function() {
-			return chai.request(app)
-	   		.get('/api/fooooo')
-	   		.then(function(res) {
-	    		res.should.have.status(200);
-	    		res.should.be.json;
-	   		});
-		});
+	    it('should return all existing trips', function() {
+		    let res;
+		    return chai.request(app)
+		    .get('/trips')
+		    .then(function(_res) {
+		        res = _res;
+		        expect(res).to.have.status(200);
+		        expect(res.body.trips).to.have.lengthOf.at.least(1);
+		        return Trip.countDocuments();
+		    })
+		    .then(function(count) {
+		        expect(res.body.trips).to.have.lengthOf(count);
+		    });
+	    });
 
-	    // it('should return all existing trips', function() {
-		   //  let res;
-		   //  return chai.request(app)
-		   //  .get('/trips')
-		   //  .then(function(_res) {
-		   //      res = _res;
-		   //      expect(res).to.have.status(200);
-		   //      expect(res.body.trips).to.have.lengthOf.at.least(1);
-		   //      return Trip.count();
-		   //  })
-		   //  .then(function(count) {
-		   //      expect(res.body.trips).to.have.lengthOf(count);
-		   //  });
-	    // });
+	    it('should return trips with right fields', function() {
+	    	let resTrip;
+	    	return chai.request(app)
+	        .get('/trips')
+	        .then(function(res) {
+	        	expect(res).to.have.status(200);
+	        	expect(res).to.be.json;
+	        	expect(res.body.trips).to.be.a('array');
+	        	res.body.trips.forEach(function(trip) {
+	            	expect(trip).to.be.a('object');
+	            	expect(trip).to.include.keys(
+	              'id', 'name', 'dates', 'location', 'tripLeader', 'collaborators', 'itineraryItems');
+	          	});
+	        	resTrip = res.body.trips[0];
+	        	return Trip.findById(resTrip.id);
+	        })
+	        .then(function(trip) {
+	        	console.log(trip);
+	        	console.log(resTrip);
+	        	expect(resTrip.id).to.equal(trip.id);
+	        	expect(resTrip.name).to.equal(trip.name);
+	        	expect(resTrip.dates).to.equal(trip.dates);
+	        	expect(resTrip.location).to.equal(trip.location);
+	        	// expect(resTrip.tripLeader).to.equal(trip.tripLeader);
+	        	// expect(resTrip.collaborators).to.equal(trip.collaborators);
+	        	// expect(resTrip.itineraryItems).to.equal(trip.itineraryItems);
 
-	    // it('should return trips with right fields', function() {
-	    // 	let resTrip;
-	    // 	return chai.request(app)
-	    //     .get('/trips')
-	    //     .then(function(res) {
-	    //     	expect(res).to.have.status(200);
-	    //     	expect(res).to.be.json;
-	    //     	expect(res.body.trips).to.be.a('array');
-	    //     	expect(res.body.trips).to.have.lengthOf.at.least(1);
-	    //     	res.body.trips.forEach(function(trip) {
-	    //         	expect(trip).to.be.a('object');
-	    //         	expect(trip).to.include.keys(
-	    //           'name', 'nights', 'id', 'location', 'totalMileage', 'shortDescription', 'longDescription', 'userContributed', 'difficulty');
-	    //       	});
-	    //     	resTrip = res.body.trips[0];
-	    //     	return Trip.findById(resTrip.id);
-	    //     })
-	    //     .then(function(trip) {
-	    //     	expect(resTrip.id).to.equal(trip.id);
-	    //     	expect(resTrip.name).to.equal(trip.name);
-	    //     	expect(resTrip.location).to.be.a('object');
-	    //     	expect(resTrip.location.longAndLat).to.equal(trip.location.longAndLat);
-	    //     	expect(resTrip.location.state).to.contain(trip.location.state);
-	    //     	expect(resTrip.nights).to.equal(trip.nights);
-	    //     	expect(resTrip.totalMileage).to.equal(trip.totalMileage);
-	    //     	expect(resTrip.difficulty).to.equal(trip.difficulty);
-	    //     	expect(resTrip.shortDescription).to.equal(trip.shortDescription);
-	    //     	expect(resTrip.longDescription).to.equal(trip.longDescription);
-	    //     });
-	    // });
+	        	expect(resTrip.collaborators).to.be.a('array');
+	        	expect(resTrip.itineraryItems).to.be.a('array');
+	        	
+	        });
+	    });
   	});
 
 	//POST endpoint for trips
@@ -285,10 +278,6 @@ describe('API', function() {
 	    	});
     	});
   	});
-
-
-
-  	
 });
 
 // Confirm static page is served

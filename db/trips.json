@@ -1,0 +1,55 @@
+{
+	"_id": "4c958af16bfe8fba53fb5fc6",
+	"name": "NYC",
+	"dates": "2.2.2020-2.20.2020",
+	"location": "New York City, NY",
+	"tripLeader": "4b958af16bfe8fba53fb5fc6",
+	"collaborators":["4b958af16bfe8fba53fb5fc6", "5b958af16bfe8fba53fb5fc6", "6b958af16bfe8fba53fb5fc6", "7b958af16bfe8fba53fb5fc6"],
+	"itineraryItems": [
+		{	
+			"_id": "4b858af16bfe8fba53fb5fc6",
+			"type": "Hotel",
+			"name": "Mariot",
+			"confirmed": false,
+			"price": 500,
+			"pool": "Yes",
+			"website": "mariot.com",
+			"other": "Close to the airport"
+			
+		},
+
+		{	
+			"_id": "4d958af16bfe8fba53fb5fc6",
+			"type": "Hotel",
+			"name": "Motel 6",
+			"confirmed": true,
+			"price": 300,
+			"pool": "Yes",
+			"website": "motel6.com",
+			"other": ""
+				
+		},
+		{
+			"_id": "4e958af16bfe8fba53fb5fc6",
+			"type": "Restaurant",
+			"name": "Yum Yum",
+			"catagory": "chinese",
+			"confirmed": true,
+			"price": "cheap",
+			"website": "yumyum.com",
+			"other": "super yelp reviews"
+			
+		},
+		{
+			"_id": "4f958af16bfe8fba53fb5fc6",	
+			"type": "Activity",
+			"name": "National Art Museum",
+			"confirmed": false,
+			"price": "free",
+			"location": "googlemaps.link",
+			"website": "museum.com"
+			
+		}
+	]
+}
+	

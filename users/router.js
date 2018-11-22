@@ -142,10 +142,12 @@ router.get('/', (req, res) => {
     });
 });
 
-//Get user by ID
+// Get user by ID
 router.get('/:id', (req, res) => {
+    console.log(req.params.id)
     User.findById(req.params.id)
-      .then(user => res.json(user.serialize()))
+
+      .then(user => res.json(user))
       .catch(err => {
           console.error(err);
           res.status(500).json({ message: 'Internal server error' });
