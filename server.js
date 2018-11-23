@@ -60,6 +60,19 @@ app.get('/trips', (req, res) => {
 		});
 });
 //GET endpoint for trips by id
+
+app.get('/trips/:id', (req, res) => {
+	Trip
+		.findById(req.params.id)
+		.populate('tripLeader')
+		.populate('collaborators')
+		.then(trip => res.json(trip.serialize()))
+		.catch(err => {
+			console.error(err);
+			res.status(500).json({message: "Internal server error"});
+		});
+});
+
 //POST endpoint for new trips
 //PUT endpoint for updating existing trips (by id)
 //DELETE endpoint for deleting existing trips (by id)

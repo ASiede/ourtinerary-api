@@ -94,8 +94,6 @@ describe('API', function() {
 	        	return Trip.findById(resTrip.id);
 	        })
 	        .then(function(trip) {
-	        	console.log(trip);
-	        	console.log(resTrip);
 	        	expect(resTrip.id).to.equal(trip.id);
 	        	expect(resTrip.name).to.equal(trip.name);
 	        	expect(resTrip.dates).to.equal(trip.dates);
@@ -103,11 +101,27 @@ describe('API', function() {
 	        	// expect(resTrip.tripLeader).to.equal(trip.tripLeader);
 	        	// expect(resTrip.collaborators).to.equal(trip.collaborators);
 	        	// expect(resTrip.itineraryItems).to.equal(trip.itineraryItems);
-
 	        	expect(resTrip.collaborators).to.be.a('array');
 	        	expect(resTrip.itineraryItems).to.be.a('array');
 	        	
 	        });
+	    });
+	    it('should return the right trip when getting by id', function() {
+	    	let trip;
+	    	return Trip
+	    		.findOne()
+	    		.then(function(_trip) {
+	    			trip = _trip;
+	    			return chai.request(app).get(`/trips/${trip.id}`);
+	    		})
+	    		.then(function(res) {
+	    			expect(res).to.have.status(200);
+	        		expect(res).to.be.json;
+	        		return Trip.findById(trip.id)
+	    		})
+	    		.then(function(_trip) {
+	    			expect(_trip.id).to.equal(trip.id)
+	    		}) 
 	    });
   	});
 
