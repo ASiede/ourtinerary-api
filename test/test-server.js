@@ -3,7 +3,7 @@ const chaiHttp = require('chai-http');
 const mongoose = require('mongoose');
 
 const expect = chai.expect;
-const should = chai.should();
+// const should = chai.should();
 
 const {Trip, User, ItineraryItem} = require('../models');
 const {app, runServer, closeServer} = require('../server');
@@ -103,7 +103,6 @@ describe('API', function() {
 	        	// expect(resTrip.itineraryItems).to.equal(trip.itineraryItems);
 	        	expect(resTrip.collaborators).to.be.a('array');
 	        	expect(resTrip.itineraryItems).to.be.a('array');
-	        	
 	        });
 	    });
 	    it('should return the right trip when getting by id', function() {
@@ -126,70 +125,61 @@ describe('API', function() {
   	});
 
 	//POST endpoint for trips
-	// describe('POST endpoint', function() {
+	describe('POST endpoint', function() {
 
-	//     it('should add a new trip', function() {
-	//     	//authorize user first
-	//     	const userData = {"username": "ehillory", "password": "everesteverest", "firsName": "Tenzing", "lastName": "Norgay"}
-	//     	return chai.request(app)
-	//         .post('/users')
-	//        	.send(userData)
-	//         .then(function(res) {          
-	//           	return chai.request(app)
-	//             .get('/users')
-	//             .then(function(res) {  
-	//             	return chai.request(app)
-	//                 	.post('/auth/login')
-	//                 	.send(userData)
-	//                 	.then(function(res) {
-	//                   		return chai.request(app)
-	//                   		const newTrip = {
-	//                     		userContributed: `${res.body.userId}`,
-	//                     		name: "Super cool Trip",
-	//                     		location: {
-	//                       			"longAndLat": "45.5122° N, 122.6587° W",
-	//                       			"state": "CA"
-	//                       		},
-	//                     		nights: "3",
-	//                     		totalMileage: "9",
-	//                     		shortDescription: "Fun trip",
-	//                     		longDescription: "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.",
-	//                     		difficulty: "easy",
-	//                     		features: ["wildflowers"]
-	//                   		}
-	//                   		.post('/trips')
-	//                   		.send(newTrip)
-	//                   		.then(function(res) {
-	// 		                    expect(res).to.have.status(201);
-	// 		                    expect(res).to.be.json;
-	// 		                    expect(res.body).to.be.a('object');
-	// 		                    expect(res.body).to.include.keys(
-	// 		                      'id', 'name', 'location', 'nights', 'totalMileage', 'shortDescription', 'longDescription', 'features');
-	// 		                    expect(res.body.id).to.not.be.null;
-	// 		                    expect(res.body.name).to.equal(newTrip.name);
-	// 		                    expect(res.body.nights).to.equal(newTrip.nights);
-	// 		                    expect(res.body.totalMileage).to.equal(newTrip.totalMileage);
-	// 		                    expect(res.body.shortDescription).to.equal(newTrip.shortDescription);
-	// 		                    expect(res.body.longDescription).to.equal(newTrip.longDescription);
-	// 		                    expect(res.body.difficulty).to.equal(newTrip.difficulty);
-	// 		                    return Trip.findById(res.body.id);
-	//                   		})
-	// 		                .then(function(trip) {
-	// 		                    expect(trip.name).to.equal(newTrip.name);
-	// 		                    expect(trip.nights).to.equal(newTrip.nights);
-	// 		                    expect(trip.totalMileage).to.equal(newTrip.totalMileage);
-	// 		                    expect(trip.shortDescription).to.equal(newTrip.shortDescription);
-	// 		                    expect(trip.longDescription).to.equal(newTrip.longDescription);
-	// 		                    expect(trip.difficulty).to.equal(newTrip.difficulty);
-	// 		                    expect(trip.features).to.contain(newTrip.features);
-	// 		                    expect(trip.location.longAndLat).to.equal(newTrip.location.longAndLat);
-	// 		                    expect(trip.location.state).to.equal(newTrip.location.state);
-	//               			})
-	//             		})
-	//           	})
-	//       	});
-	//     });
- //  	});
+	    it('should add a new trip', function() {
+	    	//authorize user first
+	    	const userData = {"username": "Rupaul", "password": "passwordpassword"}
+	    	console.log('FIRST TEST')
+	    	return chai.request(app)
+	        .post('/users')
+	       	.send(userData)
+	        .then(function(res) {          
+	          	return chai.request(app)
+	            .get('/users')
+	            .then(function(res) {  
+	            	return chai.request(app)
+	                	.post('/auth/login')
+	                	.send(userData)
+	                	.then(function(res) {
+	                		console.log('SECOND TEST')
+	                		console.log(res)
+	                  		return chai.request(app)
+	                  		const newTrip = {
+	                  			name: "Beach Getaway",
+	                  			dates: "2/2/20-3/2/20",
+	                  			location: "Key West",
+	                  			tripLeader: "Rupaul",
+	                  			collaborators: ["Trixie", "Katya"]
+	                  		}
+	                  		.post('/trips')
+	                  		.send(newTrip)
+	                  		.then(function(res) {
+			                    expect(res).to.have.status(201);
+			                    expect(res).to.be.json;
+			                    expect(res.body).to.be.a('object');
+			                    expect(res.body).to.include.keys(
+			                      'id', 'name', 'dates', 'location', 'tripLeader', 'collaborators', 'itineraryItems');
+			                    expect(res.body.id).to.not.be.null;
+			                    expect(res.body.name).to.equal(newTrip.name);
+			                    expect(res.body.dates).to.equal(newTrip.dates);
+			                    expect(res.body.location).to.equal(newTrip.location);
+			                    expect(res.body.tripLeader).to.equal(newTrip.tripLeader);
+			                    expect(res.body.collaborators).to.equal(newTrip.collaborators);
+			     				return Trip.findById(res.body.id);
+	                  		})
+			                .then(function(trip) {
+			                    expect(trip.name).to.equal(newTrip.name);
+			                    expect(trip.dates).to.equal(newTrip.dates);
+			                    expect(trip.location).to.equal(newTrip.location);
+			                    expect(trip.tripLeader).to.equal(newTrip.tripLeader);
+			                    expect(trip.collaborators).to.equal(newTrip.collaborators);
+	              			})
+	            		})
+	          	})
+	      	});
+	    });
+  	});
 
 	//PUT endpoint for trips
 	// describe('PUT endpoint', function() {
@@ -283,7 +273,7 @@ describe('API', function() {
 	    	.send(userData)
 	    	.then(function(res) {           
 	       		return chai.request(app)
-	        	const loginCreds = {"username": "ehillary", "password": "everesteverest"}
+	        	const loginCreds = {"username": "Alyssa", "password": "passwordpassword"}
 	        	.post('/auth/login')
 	        	.send(userCreds)
 	        	.then(function(res) {

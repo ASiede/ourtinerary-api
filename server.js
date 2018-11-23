@@ -43,7 +43,6 @@ app.use('/auth/', authRouter);
 const jwtAuth = passport.authenticate('jwt', { session: false });
 
 //GET endpoint for trips
-
 app.get('/trips', (req, res) => {
 	Trip
 		.find()
@@ -60,7 +59,6 @@ app.get('/trips', (req, res) => {
 		});
 });
 //GET endpoint for trips by id
-
 app.get('/trips/:id', (req, res) => {
 	Trip
 		.findById(req.params.id)
@@ -72,14 +70,149 @@ app.get('/trips/:id', (req, res) => {
 			res.status(500).json({message: "Internal server error"});
 		});
 });
-
 //POST endpoint for new trips
+app.post('/trips', jsonParser, (req, res) => {
+	// Check for required fields
+	const requiredFields = ['name', 'dates', 'location', 'tripLeader', 'collaborators'];
+ 	for (let i = 0; i < requiredFields.length; i++) {
+    	const field = requiredFields[i];
+    	if (!(field in req.body)) {
+      		const message = `Missing \`${field}\` in request body`;
+      		console.error(message);
+      		return res.status(400).send(message);
+    	}
+  	}
+	User
+    // GET user information to attach to trip document
+    .findOne({_id: `${req.body.tripLeader}`})
+    .then( user => { 
+    	if (user) {
+    		const collaborators = req.body.collaborators
+    		User
+    		.find({
+    			_id: {$in: collaborators}
+    		})
+    		.then(collaborators => {
+	        	Trip
+	        	.create({
+	          		name: req.body.name,
+	          		dates: req.body.dates,
+	          		location: req.body.location,
+	          		tripLeader: user,
+	          		collaborators: collaborators,
+	          		itineraryItems: []
+	          	})
+	        	.then(trip => {
+	        		//need to figure out how to add trip id to all collaboratos
+	        		res.status(201).json(trip.serialize())
+	        	})
+	        	.catch(err => {
+	        		console.error(err);
+	        		res.status(500).json({ message: 'Internal server error' });
+	        	})
+	        })
+	        .catch(err => {
+	        		console.error(err);
+	        		res.status(500).json({ message: 'Internal server error' });
+	        })	
+      	} else {
+        	const message = `User not found`;
+        	console.error(message);
+        	return res.status(500).send(message);
+        }    
+    })
+    .catch(err => {
+    	console.error(err);
+    	res.status(500).json({ error: 'Internal server error' });
+    })
+});
 //PUT endpoint for updating existing trips (by id)
+app.put('/trips/:id', jsonParser, (req, res) => {
+  // ensure that the id in the request path and the one in request body match
+  if (!(req.params.id && req.body.id && req.params.id === req.body.id)) {
+    const message = (
+      `Request path id (${req.params.id}) and request body id ` +
+      `(${req.body.id}) must match`);
+    console.error(message);
+    return res.status(400).json({ message: message });
+  }
+  const toUpdate = {};
+  const updateableFields = ['name', 'dates', 'location', 'collaborators'];
+  updateableFields.forEach(field => {
+    if (field in req.body) {
+      toUpdate[field] = req.body[field];
+    }
+  });
+  console.log(toUpdate)
+  Trip.findOneAndUpdate({_id:req.params.id}, { $set: toUpdate })
+  	//? not sure why the trip being returned is pre-updated-might want to change
+    .then(trip => res.status(201).json(trip.serialize()))
+    .catch(err => res.status(500).json({ message: 'Internal server error' }));
+});
+
 //DELETE endpoint for deleting existing trips (by id)
+app.delete('/trips/:id', (req, res) => {
+  Trip
+    .findOneAndDelete({_id: req.params.id})
+    .then(trip => res.status(204).end())
+    .catch(err => res.status(500).json({ message: 'Internal server error' }));
+});
 
 //GET endpoint for itinerary items
 //GET endpoint for itinerary items by id
 //POST endpoint for new itinerary items
+
+app.post('/itineraryItems', jsonParser, (req, res) => {
+	// Check for required fields
+	const requiredFields = ['name', 'tripId', 'type'];
+ 	for (let i = 0; i < requiredFields.length; i++) {
+    	const field = requiredFields[i];
+    	if (!(field in req.body)) {
+      		const message = `Missing \`${field}\` in request body`;
+      		console.error(message);
+      		return res.status(400).send(message);
+    	}
+  	}
+	Trip
+    .findOne({_id: `${req.body.tripId}`})
+    .then( trip => { 
+    	if (trip) {
+    		const collaborators = trip.collaborators
+    		User
+    		.find({
+    			_id: {$in: collaborators}
+    		})
+    		.then(collaborators => {
+	    		trip.itineraryItems.push({
+	        		type: req.body.type,
+	        		name: req.body.name,
+	        		confirmed: false,
+	        		price: req.body.price,
+	        		pool: req.body.pool,
+	        		website: req.body.website,
+	        		other: req.body.other,
+	        		votes: collaborators.map(collaborator => {
+	    				return {[collaborator.username]: null}
+	    			})
+	        	})
+	        	trip.save();
+	        	res.status(201).end()  
+	        })
+	        .catch(err => {
+    			console.error(err);
+    			res.status(500).json({ error: 'Internal server error' });
+    		})	
+      	} else {
+        	const message = `Trip not found`;
+        	console.error(message);
+        	return res.status(500).send(message);
+        } 
+    })
+    .catch(err => {
+    	console.error(err);
+    	res.status(500).json({ error: 'Internal server error' });
+    })
+});
 //PUT endpoint for updating existing itinerary items (by id)
 //DELETE endpoint for deleting existing itinerary items (by id)
 

@@ -5,6 +5,10 @@ const mongoose = require("mongoose");
 
 mongoose.Promise = global.Promise;
 
+const votesSchema = mongoose.Schema({
+
+});
+
 const itineraryItemSchema = mongoose.Schema({
     type: {type: String},
     name: {type: String, required: true},
@@ -12,8 +16,7 @@ const itineraryItemSchema = mongoose.Schema({
     price: {type: String},
     location: {type: String},
     website: {type: String},
-    ////errrrrr
-    votes: {type:String}
+    votes: {type: Array}
 });
 
 const userSchema = mongoose.Schema({

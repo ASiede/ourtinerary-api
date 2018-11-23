@@ -14,7 +14,12 @@
 			"price": 500,
 			"pool": "Yes",
 			"website": "mariot.com",
-			"other": "Close to the airport"
+			"other": "Close to the airport",
+			"votes": [{
+				"Rupaul": "Yes"
+				}, {
+					"Alyssa": "No"
+				}]
 			
 		},
 
@@ -26,7 +31,12 @@
 			"price": 300,
 			"pool": "Yes",
 			"website": "motel6.com",
-			"other": ""
+			"other": "",
+			"votes": [{
+				"Rupaul": null
+				}, {
+					"Alyssa": null
+				}]
 				
 		},
 		{
@@ -37,7 +47,12 @@
 			"confirmed": true,
 			"price": "cheap",
 			"website": "yumyum.com",
-			"other": "super yelp reviews"
+			"other": "super yelp reviews",
+			"votes": [{
+				"Rupaul": null
+				}, {
+					"Alyssa": null
+				}]
 			
 		},
 		{
@@ -47,7 +62,12 @@
 			"confirmed": false,
 			"price": "free",
 			"location": "googlemaps.link",
-			"website": "museum.com"
+			"website": "museum.com",
+			"votes": [{
+				"Rupaul": null
+				}, {
+					"Alyssa": null
+				}]
 			
 		}
 	]
