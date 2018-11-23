@@ -88,6 +88,7 @@ app.post('/trips', jsonParser, (req, res) => {
     .then( user => { 
     	if (user) {
     		const collaborators = req.body.collaborators
+    		collaborators.push(req.body.tripLeader)
     		User
     		.find({
     			_id: {$in: collaborators}
@@ -103,13 +104,28 @@ app.post('/trips', jsonParser, (req, res) => {
 	          		itineraryItems: []
 	          	})
 	        	.then(trip => {
+	        		console.log(trip)
+	        		console.log(trip._id)
 	        		//need to figure out how to add trip id to all collaboratos
+	        		
+	        		// collaborators.forEach(collaborator => {
+	        		// 	collaborator.trips.push(trip._id)
+	        		// })
+
+
+
 	        		res.status(201).json(trip.serialize())
 	        	})
+
 	        	.catch(err => {
 	        		console.error(err);
 	        		res.status(500).json({ message: 'Internal server error' });
 	        	})
+
+
+
+
+
 	        })
 	        .catch(err => {
 	        		console.error(err);
@@ -214,7 +230,57 @@ app.post('/itineraryItems', jsonParser, (req, res) => {
     })
 });
 //PUT endpoint for updating existing itinerary items (by id)
+// app.put('/itineraryItems/:id', (req, res) => {
+// 	const requiredFields = ['tripId', 'itineraryItemId'];
+//  		for (let i = 0; i < requiredFields.length; i++) {
+//     		const field = requiredFields[i];
+//     		if (!(field in req.body)) {
+//       			const message = `Missing \`${field}\` in request body`;
+//       			console.error(message);
+//       			return res.status(400).send(message);
+//     	}
+//   	}
+//   	const toUpdate = {};
+// 	const updateableFields = ['name'];
+// 	updateableFields.forEach(field => {
+//     if (field in req.body) {
+//       toUpdate[field] = req.body[field];
+//     }
+//   });
+// 	Trip
+//     .findById(req.body.tripId)
+//     .then(trip => {
+//     	console.log(trip.itineraryItems.id(req.body.itineraryItemId))
+//     	console.log(toUpdate)
+//     	trip.itineraryItems.id(req.body.itineraryItemId).updateOne({"name": "TTTTEEEEEEE"})
+//     	// trip.itineraryItems.id(req.body.itineraryItemId).updateOne()
+//     	trip.save();
+//     	res.status(204).end()
+// 	})
+//     .catch(err => res.status(500).json({ message: 'Internal server error' }));
+// });
+
 //DELETE endpoint for deleting existing itinerary items (by id)
+app.delete('/itineraryItems/:id', (req, res) => {
+	const requiredFields = ['tripId', 'itineraryItemId'];
+ 		for (let i = 0; i < requiredFields.length; i++) {
+    		const field = requiredFields[i];
+    		if (!(field in req.body)) {
+      			const message = `Missing \`${field}\` in request body`;
+      			console.error(message);
+      			return res.status(400).send(message);
+    	}
+  	}
+	Trip
+    .findById(req.body.tripId)
+    .then(trip => {
+    	trip.itineraryItems.id(req.body.itineraryItemId).remove()
+    	trip.save();
+    	res.status(204).end()
+	})
+    .catch(err => res.status(500).json({ message: 'Internal server error' }));
+});
+
 
 
 //Server setup

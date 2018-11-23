@@ -60,7 +60,7 @@ userSchema.methods.serialize = function() {
         password: this.password,
         firstName: this.firstName,
         lastName: this.lastName,
-        tripsById: this.trips
+        trips: this.trips
     };
 };
 
