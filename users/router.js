@@ -2,7 +2,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 
-const {User} = require('../models');
+const {User, Trip, ItineraryItem, Vote} = require('../models');
 
 const router = express.Router();
 
@@ -130,7 +130,8 @@ router.post('/', jsonParser, (req, res) => {
 
 //Get users
 router.get('/', (req, res) => {
-  return User.find()
+  return User
+    .find()
     .then(users => {
       res.json({
         users: users.map(user => user.serialize())
@@ -144,13 +145,17 @@ router.get('/', (req, res) => {
 
 // Get user by ID
 router.get('/:id', (req, res) => {
-    console.log(req.params.id)
-    User.findById(req.params.id)
-
-      .then(user => res.json(user))
-      .catch(err => {
-          console.error(err);
-          res.status(500).json({ message: 'Internal server error' });
+    console.log(Trip)
+    User
+        .findById(req.params.id)
+        //not populating trips
+        // .populate('trips')
+        .then(user => {
+          res.json(user.serialize())
+        })
+        .catch(err => {
+            console.error(err);
+            res.status(500).json({ message: 'Internal server error' });
     });
 });
 

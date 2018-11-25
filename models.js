@@ -5,10 +5,6 @@ const mongoose = require("mongoose");
 
 mongoose.Promise = global.Promise;
 
-const votesSchema = mongoose.Schema({
-
-});
-
 const itineraryItemSchema = mongoose.Schema({
     type: {type: String},
     name: {type: String, required: true},
@@ -16,23 +12,19 @@ const itineraryItemSchema = mongoose.Schema({
     price: {type: String},
     location: {type: String},
     website: {type: String},
-    votes: {type: Array}
+    votes: [{type: mongoose.Schema.Types.ObjectId, ref: 'Vote'}]
 });
 
-const userSchema = mongoose.Schema({
-    username: {
-      type: String,
-      required: true,
-      unique: true
-    },
-    password: {
-      type: String,
-      required: true
-    },
-    firstName: {type: String, default: ""},
-    lastName: {type: String, default: ""},
-    trips:[{type: mongoose.Schema.Types.ObjectId, ref: 'Trip'}]
-});
+const voteSchema = mongoose.Schema({
+    itineraryItem: {type: mongoose.Schema.Types.ObjectId, ref: 'ItineraryItem', required: true},
+    user: {type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true},
+    status: {type: String, default: ""}
+})
+
+// const voteSchema = mongoose.Schema({
+
+// })
+
 
 const tripSchema = mongoose.Schema({
     name: {
@@ -51,7 +43,20 @@ const tripSchema = mongoose.Schema({
     itineraryItems:[itineraryItemSchema]
 });
 
-
+const userSchema = mongoose.Schema({
+    username: {
+      type: String,
+      required: true,
+      unique: true
+    },
+    password: {
+      type: String,
+      required: true
+    },
+    firstName: {type: String, default: ""},
+    lastName: {type: String, default: ""},
+    trips:[{type: mongoose.Schema.Types.ObjectId, ref: 'Trip'}]
+});
 
 userSchema.methods.serialize = function() {
     return {
@@ -65,11 +70,11 @@ userSchema.methods.serialize = function() {
 };
 
 tripSchema.virtual('tripLeaderUsername').get(function() {
-  return `${this.tripLeader.username}`
+    return `${this.tripLeader.username}`
 })
 
 tripSchema.virtual('collaboratorUsernames').get(function() {
-  return this.collaborators.map(collaborator => `${collaborator.username}`)
+    return this.collaborators.map(collaborator => `${collaborator.username}`)
 })
 
 tripSchema.methods.serialize = function() {
@@ -98,20 +103,28 @@ itineraryItemSchema.methods.serialize = function() {
     }
 }
 
+voteSchema.methods.serialize = function() {
+    return {
+      // id: this._id,
+      status: this.status
+    }
+}
+
 userSchema.methods.validatePassword = function(password) {
-  return bcrypt.compare(password, this.password);
+    return bcrypt.compare(password, this.password);
 };
 
 userSchema.statics.hashPassword = function(password) {
-  return bcrypt.hash(password, 10);
+    return bcrypt.hash(password, 10);
 };
 
 
 const Trip = mongoose.model("Trip", tripSchema);
 const User = mongoose.model("User", userSchema);
-const ItineraryItem = mongoose.model("ItineraryItem", itineraryItemSchema);
+const ItineraryItem = mongoose.model("ItineraryItem", itineraryItemSchema, "itineraryItems");
+const Vote = mongoose.model("Vote", voteSchema)
 
-module.exports = { Trip, User, ItineraryItem };
+module.exports = { Trip, User, ItineraryItem, Vote };
 
 
 

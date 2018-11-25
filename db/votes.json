@@ -1,0 +1,30 @@
+[
+	{
+		"_id": "4b858af16bfe8fba53fb5ac6",
+		"itineraryItem": "4b858af16bfe8fba53fb5fc6",
+		"tripId":"4c958af16bfe8fba53fb5fc6",
+		"user": "4b958af16bfe8fba53fb5fc6",
+		"status":"Yes"
+	},
+		{
+		"_id": "4b858af16bfe8fba53fb5bc6",
+		"itineraryItem": "4b858af16bfe8fba53fb5fc6",
+		"tripId":"4c958af16bfe8fba53fb5fc6",
+		"user": "5b958af16bfe8fba53fb5fc6",
+		"status":"No"
+	},
+		{
+		"_id": "4b858af16bfe8fba53fb5cc6",
+		"itineraryItem": "4b858af16bfe8fba53fb5fc6",
+		"tripId":"4c958af16bfe8fba53fb5fc6",
+		"user": "6b958af16bfe8fba53fb5fc6",
+		"status":"Yes"
+	},
+		{
+		"_id": "4b858af16bfe8fba53fb5dc6",
+		"itineraryItem": "4b858af16bfe8fba53fb5fc6",
+		"tripId":"4c958af16bfe8fba53fb5fc6",
+		"user": "7b958af16bfe8fba53fb5fc6",
+		"status":""
+	}
+]
