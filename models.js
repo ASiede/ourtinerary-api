@@ -5,6 +5,12 @@ const mongoose = require("mongoose");
 
 mongoose.Promise = global.Promise;
 
+const voteSchema = mongoose.Schema({
+    itineraryItem: {type: mongoose.Schema.Types.ObjectId, ref: 'ItineraryItem', required: true},
+    user: {type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true},
+    status: {type: String, default: ""}
+})
+
 const itineraryItemSchema = mongoose.Schema({
     type: {type: String},
     name: {type: String, required: true},
@@ -12,18 +18,10 @@ const itineraryItemSchema = mongoose.Schema({
     price: {type: String},
     location: {type: String},
     website: {type: String},
-    votes: [{type: mongoose.Schema.Types.ObjectId, ref: 'Vote'}]
+    // votes: [{type: mongoose.Schema.Types.ObjectId, ref: 'Vote'}]
+    votes: [voteSchema]
 });
 
-const voteSchema = mongoose.Schema({
-    itineraryItem: {type: mongoose.Schema.Types.ObjectId, ref: 'ItineraryItem', required: true},
-    user: {type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true},
-    status: {type: String, default: ""}
-})
-
-// const voteSchema = mongoose.Schema({
-
-// })
 
 
 const tripSchema = mongoose.Schema({
