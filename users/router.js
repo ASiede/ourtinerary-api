@@ -145,7 +145,6 @@ router.get('/', (req, res) => {
 
 // Get user by ID
 router.get('/:id', (req, res) => {
-    console.log(Trip)
     User
         .findById(req.params.id)
         //not populating trips
