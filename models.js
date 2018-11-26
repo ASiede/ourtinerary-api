@@ -53,7 +53,8 @@ const userSchema = mongoose.Schema({
     },
     firstName: {type: String, default: ""},
     lastName: {type: String, default: ""},
-    trips:[{type: mongoose.Schema.Types.ObjectId, ref: 'Trip'}]
+    tripIds: [{type: String}]
+    // trips:[{type: mongoose.Schema.Types.ObjectId, ref: 'Trip'}]
 });
 
 userSchema.methods.serialize = function() {
@@ -63,7 +64,7 @@ userSchema.methods.serialize = function() {
         password: this.password,
         firstName: this.firstName,
         lastName: this.lastName,
-        trips: this.trips
+        tripIds: this.tripIds
     };
 };
 

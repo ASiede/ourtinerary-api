@@ -4,7 +4,7 @@
 	    "_id":"4b958af16bfe8fba53fb5fc6",
 	    "username": "Rupaul",
 	    "password": "passwordpassword",
-	    "trips": [
+	    "tripIds": [
 	    	"4c958af16bfe8fba53fb5fc6",
 	    	"4b758af16bfe8fba53fb5fc6",
 	    	"4b658af16bfe8fba53fb5fc6",
@@ -16,7 +16,7 @@
 	    "_id": "5b958af16bfe8fba53fb5fc6",
 	    "username": "Alyssa",
 	    "password": "passwordpassword",
-	    "trips": [
+	    "tripsIds": [
 	        "4c958af16bfe8fba53fb5fc6",
 	        "5bf88ef417e4e25f925de979"
 	    ]
@@ -26,13 +26,13 @@
 	    "_id": "6b958af16bfe8fba53fb5fc6",
 	    "username": "Katya",
 	    "password": "passwordpassword",
-	    "trips": []
+	    "tripIds": []
 	}, 
 	{
 	    "_id": "7b958af16bfe8fba53fb5fc6",
 	    "username": "Trixie",
 	    "password": "passwordpassword",
-	    "trips": []
+	    "tripIds": []
 	}
 	
 ]
