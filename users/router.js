@@ -132,7 +132,19 @@ router.post('/', jsonParser, (req, res) => {
 router.get('/', (req, res) => {
   return User
     .find()
+    .populate('trips')
+    // .populate('trips.collaborators')
+    // .populate({
+    //   path: 'trips',
+    //   populate: {
+    //     path: 'collaborators',
+    //     model: 'User',
+    //     select: 'firstName'
+    //   }
+    // })
+    // .populate('trips.itineraryItems')
     .then(users => {
+       console.log(users)
       res.json({
         users: users.map(user => user.serialize())
       })
@@ -148,8 +160,10 @@ router.get('/:id', (req, res) => {
     User
         .findById(req.params.id)
         //not populating trips
-        // .populate('trips')
+        .populate('trips')
+        .populate('trips.collaborators')
         .then(user => {
+
           res.json(user.serialize())
         })
         .catch(err => {

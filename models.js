@@ -22,7 +22,35 @@ const itineraryItemSchema = mongoose.Schema({
     votes: [voteSchema]
 });
 
+const userSchema = mongoose.Schema({
+    username: {
+      type: String,
+      required: true,
+      unique: true
+    },
+    password: {
+      type: String,
+      required: true
+    },
+    firstName: {type: String, default: ""},
+    lastName: {type: String, default: ""},
+    trips:[{type: mongoose.Schema.Types.ObjectId, ref: 'Trip'}]
+});
 
+// userSchema.virtual('tripIDS').get(function() {
+//     return this.tripsIds.map(trip => trip.name)
+// })
+
+userSchema.methods.serialize = function() {
+    return {
+        id: this._id,
+        username: this.username,
+        password: this.password,
+        firstName: this.firstName,
+        lastName: this.lastName,
+        trips: this.trips
+    };
+};
 
 const tripSchema = mongoose.Schema({
     name: {
@@ -41,32 +69,7 @@ const tripSchema = mongoose.Schema({
     itineraryItems:[itineraryItemSchema]
 });
 
-const userSchema = mongoose.Schema({
-    username: {
-      type: String,
-      required: true,
-      unique: true
-    },
-    password: {
-      type: String,
-      required: true
-    },
-    firstName: {type: String, default: ""},
-    lastName: {type: String, default: ""},
-    tripIds: [{type: String}]
-    // trips:[{type: mongoose.Schema.Types.ObjectId, ref: 'Trip'}]
-});
 
-userSchema.methods.serialize = function() {
-    return {
-        id: this._id,
-        username: this.username,
-        password: this.password,
-        firstName: this.firstName,
-        lastName: this.lastName,
-        tripIds: this.tripIds
-    };
-};
 
 tripSchema.virtual('tripLeaderUsername').get(function() {
     return `${this.tripLeader.username}`
