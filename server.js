@@ -29,6 +29,14 @@ app.use(
         origin: CLIENT_ORIGIN
     })
 );
+
+app.use(function(req, res, next) {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Methods", "GET, PUT, POST, DELETE");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
+
 app.use(express.static('public'));
 app.use(express.json());
 app.use(morgan('common'));
@@ -44,8 +52,9 @@ const jwtAuth = passport.authenticate('jwt', { session: false });
 
 //GET endpoint for trips
 app.get('/trips', (req, res) => {
-	Trip
-		.find()
+
+  Trip
+		.find(searchParams)
 		.populate('tripLeader')
 		.populate('collaborators')
 		//not populating but doing something
@@ -68,7 +77,8 @@ app.get('/trips/:id', (req, res) => {
 		.populate('collaborators')
 		// NOT WORKNG CORRECTLY
 		.populate({path:'itineraryItems.votes', select: 'Vote'})
-		.then(trip => res.json(trip.serialize()))
+    // .then(trip => res.json(trip.serialize()))
+		.then(trip => res.end())
 		.catch(err => {
 			console.error(err);
 			res.status(500).json({message: "Internal server error"});
@@ -218,7 +228,7 @@ app.post('/itineraryItems', jsonParser, (req, res) => {
               pool: req.body.pool,
               website: req.body.website,
               other: req.body.other,
-              // votes: []
+              // votes: collaboratrs.map(collaborator =>)
             })
             .then(itineraryItem => {
                 const collaborators = trip.collaborators
@@ -265,6 +275,8 @@ app.post('/itineraryItems', jsonParser, (req, res) => {
              //    // trip.itineraryItems.push(itineraryItem)
              //    // trip.save()
              //    // console.log(trip)
+        ItineraryItem
+        .findById()
 
       	} else {
         	const message = `Trip not found`;
