@@ -18,8 +18,8 @@ const itineraryItemSchema = mongoose.Schema({
     price: {type: String},
     location: {type: String},
     website: {type: String},
-    // votes: [{type: mongoose.Schema.Types.ObjectId, ref: 'Vote'}]
-    votes: [voteSchema]
+    votes: [{type: mongoose.Schema.Types.ObjectId, ref: 'Vote'}]
+    // votes: [voteSchema]
 });
 
 const userSchema = mongoose.Schema({

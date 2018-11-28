@@ -214,7 +214,7 @@ app.post('/itineraryItems', jsonParser, (req, res) => {
     .findOne({_id: `${req.body.tripId}`})
     .then( trip => { 
         if (trip) {
-            let votes = 0
+            
             ItineraryItem
             .create({
               type: req.body.type,
@@ -237,31 +237,34 @@ app.post('/itineraryItems', jsonParser, (req, res) => {
                         status: ""
                     })
                     .then(vote => {
+                        
                         ItineraryItem
-                        .findByIdAndUpdate(itineraryItem._id, {$push: {votes: vote}})
-                        .populate('votes')
-                        .then(updatedItineraryItem => console.log(updatedItineraryItem))
-                        .catch(err => {
-                            console.error(err);
-                            res.status(500).json({ error: 'Internal server error' });
+                        .findByIdAndUpdate(itineraryItem.id, {$push: {votes: vote}}) 
+                        .then(updatedItem => {
+                            res.status(200).end()
+                            console.log(updatedItem)
+                            // itineraryItem = updatedItem
+                            // console.log(itineraryItem)
+                            // console.log('test')
+                            // console.log(updatedItem)
                         }) 
-                        // res.status(200).end()
+                       .catch(err => {
+                        console.error(err);
+                        res.status(500).json({ error: 'Internal server error' });
+                      })  
                     })
                     .catch(err => {
                         console.error(err);
                         res.status(500).json({ error: 'Internal server error' });
                     })    
                 })
-                // Trip
-                // .findByIdAndUpdate(trip._id, {$push: {itineraryItems: {"test":"test"}}})
-                // .then(updatedItineraryItem => console.log(updatedItineraryItem))
-                // .catch(err => {
-                //     console.error(err);
-                //     res.status(500).json({ error: 'Internal server error' });
-                // }) 
-                trip.itineraryItems.push(itineraryItem)
-                trip.save()
-                res.status(201).json(itineraryItem.serialize())
+                ItineraryItem
+                .findById(itineraryItem.id)
+                .then(itineraryItem => {
+                  console.log(itineraryItem)
+                  res.status(201).json(itineraryItem.serialize())
+                })
+                
             })
 
             .catch(err => {
