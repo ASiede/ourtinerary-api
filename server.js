@@ -73,12 +73,16 @@ app.get('/trips', (req, res) => {
 app.get('/trips/:id', (req, res) => {
 	Trip
 		.findById(req.params.id)
-		.populate('trips')
+		
+		.populate('tripLeader')
 		.populate('collaborators')
+		.populate('itineraryItems')
 		// NOT WORKNG CORRECTLY
-		.populate({path:'itineraryItems.votes', select: 'Vote'})
+		.populate({
+			path:'itineraryItems.votes', select: 'Vote'
+		})
     // .then(trip => res.json(trip.serialize()))
-		.then(trip => res.end())
+		.then(trip => res.status(200).json(trip.serialize()))
 		.catch(err => {
 			console.error(err);
 			res.status(500).json({message: "Internal server error"});
@@ -122,9 +126,9 @@ app.post('/trips', jsonParser, (req, res) => {
                       console.log(collaborator)
                       console.log(trip)
                       User
-	        			      .findByIdAndUpdate(collaborator._id, { $push: {trips: trip}})
-                      .then(updatedUser => console.log(updatedUser))
-                      .catch(err => {
+	        			.findByIdAndUpdate(collaborator._id, { $push: {trips: trip}})
+                     	.then(updatedUser => console.log(updatedUser))
+                     	.catch(err => {
                           console.error(err);
                           res.status(500).json({ message: 'Internal server error' });
                       })
@@ -169,6 +173,15 @@ app.put('/trips/:id', jsonParser, (req, res) => {
     }
   });
   Trip.findOneAndUpdate({_id:req.params.id}, { $set: toUpdate })
+  	.populate({
+    	path: 'itineraryItems',
+    	model: 'ItineraryItem',
+    	populate: {
+    		path: 'votes',
+    		model: 'Vote'
+    	}
+
+    })
     .then(trip => res.status(201).end())
     .catch(err => res.status(500).json({ message: 'Internal server error' }));
 });
@@ -189,6 +202,16 @@ app.delete('/trips/:id', (req, res) => {
 app.get('/itineraryItems/:id', (req, res) => {
   ItineraryItem
     .findById(req.params.id)
+    // .populate('votes')
+    .populate({
+    	path: 'votes',
+    	model: 'Vote',
+    	populate: {
+    		path: 'user',
+    		model: 'User'
+    	}
+
+    })
     .then(itineraryItem => res.json(itineraryItem.serialize()))
     .catch(err => {
       console.error(err);
@@ -214,7 +237,6 @@ app.post('/itineraryItems', jsonParser, (req, res) => {
     .findOne({_id: `${req.body.tripId}`})
     .then( trip => { 
         if (trip) {
-            
             ItineraryItem
             .create({
               type: req.body.type,
@@ -227,8 +249,22 @@ app.post('/itineraryItems', jsonParser, (req, res) => {
               votes: []
             })
             .then(itineraryItem => {
+            	Trip
+            	.findByIdAndUpdate(
+            		trip.id,
+            		{$push: {itineraryItems: itineraryItem}}
+            	)
+            	// .populate('itineraryItems.votes')
+            	.then(updatedTrip => {
+            		// res.status(500).end()
+		        })	
+            	.catch(err => {
+            		console.error(err);
+            		res.status(500).json({ error: 'Internal server error' });
+          		})
+                
                 const collaborators = trip.collaborators
-                let votes = collaborators.map(collaborator => {
+               	collaborators.forEach(collaborator => {
                     Vote
                     .create({
                         itineraryItem: itineraryItem._id,
@@ -237,40 +273,32 @@ app.post('/itineraryItems', jsonParser, (req, res) => {
                         status: ""
                     })
                     .then(vote => {
-                        
                         ItineraryItem
-                        .findByIdAndUpdate(itineraryItem.id, {$push: {votes: vote}}) 
-                        .then(updatedItem => {
-                            res.status(200).end()
-                            console.log(updatedItem)
-                            // itineraryItem = updatedItem
-                            // console.log(itineraryItem)
-                            // console.log('test')
-                            // console.log(updatedItem)
-                        }) 
-                       .catch(err => {
-                        console.error(err);
-                        res.status(500).json({ error: 'Internal server error' });
-                      })  
+                		.findByIdAndUpdate(itineraryItem.id,{$push: {votes: vote}})
+			        	.populate('votes')
+			        	.then(item => {
+			        		// res.status(200).end()
+			        	})
+			        	.catch(err => {
+                			console.error(err);
+                			res.status(500).json({ error: 'Internal server error' });
+              			})
+                    // res.status(200).end()
                     })
                     .catch(err => {
                         console.error(err);
                         res.status(500).json({ error: 'Internal server error' });
-                    })    
+                    })  
                 })
-                ItineraryItem
-                .findById(itineraryItem.id)
-                .then(itineraryItem => {
-                  console.log(itineraryItem)
-                  res.status(201).json(itineraryItem.serialize())
-                })
-                
-            })
 
+            res.status(200).json(itineraryItem.serialize())   
+            })      
             .catch(err => {
                 console.error(err);
                 res.status(500).json({ error: 'Internal server error' });
             })
+        // res.status(200).end()
+                    
       	} else {
         	const message = `Trip not found`;
         	console.error(message);
