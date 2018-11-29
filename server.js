@@ -252,7 +252,8 @@ app.post('/itineraryItems', jsonParser, (req, res) => {
             	Trip
             	.findByIdAndUpdate(
             		trip.id,
-            		{$push: {itineraryItems: itineraryItem}}
+            		{$push: {itineraryItems: itineraryItem}},
+            		{new: true}
             	)
             	// .populate('itineraryItems.votes')
             	.then(updatedTrip => {
@@ -274,7 +275,7 @@ app.post('/itineraryItems', jsonParser, (req, res) => {
                     })
                     .then(vote => {
                         ItineraryItem
-                		.findByIdAndUpdate(itineraryItem.id,{$push: {votes: vote}})
+                		.findByIdAndUpdate(itineraryItem.id,{$push: {votes: vote}}, {new: true})
 			        	.populate('votes')
 			        	.then(item => {
 			        		// res.status(200).end()
@@ -283,7 +284,7 @@ app.post('/itineraryItems', jsonParser, (req, res) => {
                 			console.error(err);
                 			res.status(500).json({ error: 'Internal server error' });
               			})
-                    // res.status(200).end()
+                    // res.status(200).json(itineraryItem.serialize()) 
                     })
                     .catch(err => {
                         console.error(err);
@@ -291,7 +292,7 @@ app.post('/itineraryItems', jsonParser, (req, res) => {
                     })  
                 })
 
-            res.status(200).json(itineraryItem.serialize())   
+            res.status(200).json(itineraryItem.serialize())  
             })      
             .catch(err => {
                 console.error(err);
@@ -314,7 +315,7 @@ app.post('/itineraryItems', jsonParser, (req, res) => {
 
 //PUT endpoint for updating existing itinerary items (by id)
 app.put('/itineraryItems/:id', (req, res) => {
-    const requiredFields = ['itineraryItemId', 'tripId'];
+    const requiredFields = ['id', 'tripId'];
     for (let i = 0; i < requiredFields.length; i++) {
         const field = requiredFields[i];
         if (!(field in req.body)) {
@@ -324,18 +325,55 @@ app.put('/itineraryItems/:id', (req, res) => {
         }
     }
     const toUpdate = {};
-    const updateableFields = ['name'];
+    const updateableFields = ['name', 'flightNumber', 'confirmed', 'price', 'foodType', 'pool', 'website', 'other', 'votes'];
     updateableFields.forEach(field => {
         if (field in req.body) {
             toUpdate[field] = req.body[field];
         }
     });
     ItineraryItem
-        .findOneAndUpdate({_id: req.body.itineraryItemId}, toUpdate)
+        .findOneAndUpdate({_id: req.body.id}, toUpdate)
         .then(itineraryItem => {
             res.status(201).json(itineraryItem.serialize())
         })
+        .catch(err => {
+        	console.error(err);
+        	res.status(500).json({ error: 'Internal server error' });
+    	})
         //NEED TO UPDATE TRIP
+
+});
+
+//PUT endpoint for updating votes (by id)
+app.put('/votes/:id', (req, res) => {
+    const requiredFields = ['id'];
+    for (let i = 0; i < requiredFields.length; i++) {
+        const field = requiredFields[i];
+        if (!(field in req.body)) {
+            const message = `Missing \`${field}\` in request body`;
+            console.error(message);
+            return res.status(400).send(message);
+        }
+    }
+    const toUpdate = {};
+    const updateableFields = ['status'];
+    updateableFields.forEach(field => {
+        if (field in req.body) {
+            toUpdate[field] = req.body[field];
+        }
+    });
+    Vote
+        .findOneAndUpdate({_id: req.body.id}, toUpdate, {new: true})
+        .then(vote => {
+            res.status(200).json({
+            	id: req.body.id,
+            	status: req.body.status
+            })
+        })
+        .catch(err => {
+        	console.error(err);
+        	res.status(500).json({ error: 'Internal server error' });
+    	})
 
 });
 
