@@ -52,22 +52,50 @@ const jwtAuth = passport.authenticate('jwt', { session: false });
 
 //GET endpoint for trips
 app.get('/trips', (req, res) => {
-
-  Trip
-		.find()
-		.populate('tripLeader')
-		.populate('collaborators')
-		//not populating but doing something
-		// .populate({path:'itineraryItems.votes', select: 'Vote'})
-		.then(trips => {
-			res.json({
-				trips: trips.map(trip => trip.serialize())
-			});
+	let searchParametersArray = []
+	if (req.body.ids) {
+		req.body.ids.map(id => {
+			console.log(id)
+			searchParametersArray.push(id)
 		})
-		.catch(err => {
-			console.error(err);
-			res.status(500).json({message: "Internal server error"});
-		});
+	}
+
+	console.log(searchParametersArray)
+
+	if (req.body.ids) {
+		Trip
+			.find({_id: {$in: searchParametersArray}})
+			.populate('tripLeader')
+			.populate('collaborators')
+			//not populating but doing something
+			// .populate({path:'itineraryItems.votes', select: 'Vote'})
+			.then(trips => {
+				res.json({
+					trips: trips.map(trip => trip.serialize())
+				});
+			})
+			.catch(err => {
+				console.error(err);
+				res.status(500).json({message: "Internal server error"});
+			});
+	} else {
+		Trip
+			.find()
+			.populate('tripLeader')
+			.populate('collaborators')
+			//not populating but doing something
+			// .populate({path:'itineraryItems.votes', select: 'Vote'})
+			.then(trips => {
+				res.json({
+					trips: trips.map(trip => trip.serialize())
+				});
+			})
+			.catch(err => {
+				console.error(err);
+				res.status(500).json({message: "Internal server error"});
+			});
+	}	
+
 });
 //GET endpoint for trips by id
 app.get('/trips/:id', (req, res) => {
@@ -249,6 +277,7 @@ app.post('/itineraryItems', jsonParser, (req, res) => {
               votes: []
             })
             .then(itineraryItem => {
+            	let updatedItineraryItem = itineraryItem
             	Trip
             	.findByIdAndUpdate(
             		trip.id,
@@ -265,7 +294,7 @@ app.post('/itineraryItems', jsonParser, (req, res) => {
           		})
                 
                 const collaborators = trip.collaborators
-               	collaborators.forEach(collaborator => {
+               	collaborators.forEach((collaborator, index) => {
                     Vote
                     .create({
                         itineraryItem: itineraryItem._id,
@@ -274,12 +303,17 @@ app.post('/itineraryItems', jsonParser, (req, res) => {
                         status: ""
                     })
                     .then(vote => {
+
+
                         ItineraryItem
                 		.findByIdAndUpdate(itineraryItem.id,{$push: {votes: vote}}, {new: true})
 			        	.populate('votes')
 			        	.then(item => {
+			        		// console.log(item)
+			        		if (index === (collaborators.length -1)) {
+			        		res.status(201).json(item.serialize())
 			        		// res.status(200).end()
-			        	})
+			        	}})
 			        	.catch(err => {
                 			console.error(err);
                 			res.status(500).json({ error: 'Internal server error' });
@@ -291,8 +325,8 @@ app.post('/itineraryItems', jsonParser, (req, res) => {
                         res.status(500).json({ error: 'Internal server error' });
                     })  
                 })
-
-            res.status(200).json(itineraryItem.serialize())  
+            // console.log(updatedItineraryItem)   	
+            // res.status(200).json(updatedItineraryItem.serialize())  
             })      
             .catch(err => {
                 console.error(err);
