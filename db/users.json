@@ -3,6 +3,7 @@
 	{
 	    "_id":"4b958af16bfe8fba53fb5fc6",
 	    "username": "Rupaul",
+	    "email": "email@gmail.com",
 	    "password": "passwordpassword",
 	    "tripIds": [
 	    	"4c958af16bfe8fba53fb5fc6",
@@ -15,6 +16,7 @@
 	{
 	    "_id": "5b958af16bfe8fba53fb5fc6",
 	    "username": "Alyssa",
+	    "email": "email1@gmail.com",
 	    "password": "passwordpassword",
 	    "tripsIds": [
 	        "4c958af16bfe8fba53fb5fc6",
@@ -25,12 +27,14 @@
 	{
 	    "_id": "6b958af16bfe8fba53fb5fc6",
 	    "username": "Katya",
+	    "email": "email2@gmail.com",
 	    "password": "passwordpassword",
 	    "tripIds": []
 	}, 
 	{
 	    "_id": "7b958af16bfe8fba53fb5fc6",
 	    "username": "Trixie",
+	    "email": "email3@gmail.com",
 	    "password": "passwordpassword",
 	    "tripIds": []
 	}

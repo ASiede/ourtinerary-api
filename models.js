@@ -71,8 +71,8 @@ const tripSchema = mongoose.Schema({
     },
     tripLeader: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
     collaborators:[{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
-    itineraryItems:[{type: mongoose.Schema.Types.ObjectId, ref: 'ItineraryItem'}]
-    // itineraryItems:[itineraryItemSchema]
+    // itineraryItems:[{type: mongoose.Schema.Types.ObjectId, ref: 'ItineraryItem'}]
+    itineraryItems:[itineraryItemSchema]
 });
 
 
