@@ -52,6 +52,10 @@ app.use('/auth/', authRouter);
 //include this as middleware for anything for which you must be an authorized user
 const jwtAuth = passport.authenticate('jwt', { session: false });
 
+ app.get('/', (req, res) => {
+   res.json({ok: true});
+ });
+
 //GET endpoint for trips
 app.get('/trips', (req, res) => {
 	let searchParametersArray = []
