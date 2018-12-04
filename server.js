@@ -5,6 +5,8 @@ const mongoose = require('mongoose');
 const morgan = require('morgan');
 const passport = require('passport');
 const cors = require('cors');
+const path = require('path')
+const nodeMailer = require('nodemailer');
 
 require('dotenv').config();
 
@@ -246,100 +248,111 @@ app.get('/itineraryItems/:id', (req, res) => {
 //POST endpoint for new itinerary items
 app.post('/itineraryItems', jsonParser, (req, res) => {
     // Check for required fields
-    const requiredFields = ['name', 'tripId', 'type'];
+    const requiredFields = ['tripId', 'type'];
     for (let i = 0; i < requiredFields.length; i++) {
         const field = requiredFields[i];
         if (!(field in req.body)) {
       	    const message = `Missing \`${field}\` in request body`;
       		  console.error(message);
-      		return res.status(400).send(message);
-    	   }
+      		  return res.status(400).send(message);
+        }
   	}
+
     Trip
     .findOne({_id: `${req.body.tripId}`})
     .then( trip => { 
         if (trip) {
             ItineraryItem
             .create({
-              type: req.body.type,
-              name: req.body.name,
-              confirmed: false,
-              price: req.body.price,
-              pool: req.body.pool,
-              website: req.body.website,
-              other: req.body.other,
-              votes: []
+                type: req.body.type,
+                confirmed: false,
+                flightNumber: req.body.flightNumber,
+                layovers: req.body.layovers,
+                length: req.body.length,
+                departureTimeArrivalTime: req.body.departureTimeArrivalTime,
+                name: req.body.name,
+                price: req.body.price,
+                location: req.body.location,
+                pool: req.body.pool,
+                foodType: req.body.foodType,
+                website: req.body.website,
+                other: req.body.other,
+                votes: []
             })
             .then(itineraryItem => {
-            	Trip
-            	.findById(trip.id)
-            	.then(updatedTrip => {
-            		const collaborators = trip.collaborators
-	               	collaborators.forEach((collaborator, index) => {
-	                    Vote
-	                    .create({
-	                        itineraryItem: itineraryItem._id,
-	                        tripId: req.body.tripId,
-	                        user: collaborator,
-	                        status: ""
-	                    })
-	                    .then(vote => {
-	                        ItineraryItem
-	                		.findByIdAndUpdate(itineraryItem.id,{$push: {votes: vote}}, {new: true})
-				        	.populate('votes')
-				        	.then(updatedItem => {
-				        		if (index === (collaborators.length -1)) {
-				        			ItineraryItem
-				        			.find(
-				        				{_id: itineraryItem._id}
-				        			)
-				        			.then(newItem => {
-				        				Trip
-				        				.findOneAndUpdate(
-				        				{_id: trip._id},
-				        				{$push: {itineraryItems: newItem}},
-				        				{new: true}
-				        				)
-				        				.then(finalTrip => {
-				        				})
-				        				.catch(err => {
-			                				console.error(err);
-			                				res.status(500).json({ error: 'Internal server error' });
-			              				})
-				        			})
-				        			.catch(err => {
-			                			console.error(err);
-			                			res.status(500).json({ error: 'Internal server error' });
-			              			})
+                Trip
+                .findById(trip.id)
+                .then(updatedTrip => {
+                		const collaborators = trip.collaborators
+                    collaborators.forEach((collaborator, index) => {
+                        Vote
+                        .create({
+                            itineraryItem: itineraryItem._id,
+                            tripId: req.body.tripId,
+                            user: collaborator,
+                            status: ""
+                        })
+                        .then(vote => {
+                            ItineraryItem
+                                .findByIdAndUpdate(itineraryItem.id,{$push: {votes: vote}}, {new: true})
+                                .populate('votes')
+                                .then(updatedItem => {
+                                    if (index === (collaborators.length -1)) {
+                				        		    ItineraryItem
+                				        		    .find({_id: itineraryItem._id})
+                				        		    .then(newItem => {
+                    				        				Trip
+                    				        				.findOneAndUpdate(
+                        				        				{_id: trip._id},
+                        				        				{$push: {itineraryItems: newItem}},
+                        				        				{new: true}
+                    				        				)
+                				        				    .then(finalTrip => {
 
-				        		res.status(201).json(updatedItem.serialize())
-				        	}})
-				        	.catch(err => {
-	                			console.error(err);
-	                			res.status(500).json({ error: 'Internal server error' });
-	              			})
-	                    })
-	                    .catch(err => {
-	                        console.error(err);
-	                        res.status(500).json({ error: 'Internal server error' });
-	                    })  
-	                })
+                                            })
+                                            .catch(err => {
+                                                console.error(err);
+                                                res.status(500).json({ error: 'Internal server error' });
+                                            })
+                                        console.log(newItem)
+                                        console.log(newItem[0].flightNumber)    
+                                        res.status(201).json(newItem[0].serialize()) 
+                				        				})
+                				        				.catch(err => {
+              			                				console.error(err);
+              			                				res.status(500).json({ error: 'Internal server error' });
+              			              			})	
+                                    } 
+                                // console.log(updatedItem)      
+                                })       	 
+                                .catch(err => {
+    		                			      console.error(err);
+    		                			      res.status(500).json({ error: 'Internal server error' });
+    		              			    })
+                        // res.status(200).end()       
+                        })
+                        .catch(err => {
+                    			  console.error(err);
+                    			  res.status(500).json({ error: 'Internal server error' });
+                  			})
+                    })
+                })
+                .catch(err => {
+                    console.error(err);
+                    res.status(500).json({ error: 'Internal server error' });
+                })   
+            // console.log(itineraryItem)           
 		        })	
-            	.catch(err => {
+            .catch(err => {
             		console.error(err);
             		res.status(500).json({ error: 'Internal server error' });
-          		})  
-            })      
-            .catch(err => {
-                console.error(err);
-                res.status(500).json({ error: 'Internal server error' });
-            })      
+          	})             
       	} else {
         	const message = `Trip not found`;
         	console.error(message);
         	return res.status(500).send(message);
         }
-    })  
+    }) 
     .catch(err => {
         console.error(err);
         res.status(500).json({ error: 'Internal server error' });
@@ -469,6 +482,35 @@ app.delete('/itineraryItems/:id', (req, res) => {
     .catch(err => res.status(500).json({ message: 'Internal server error' }));    
     
 });
+
+//POST endpoint for invite a non user
+app.post('/send-email', function (req, res) {
+      let transporter = nodeMailer.createTransport({
+          host: 'smtp.gmail.com',
+          port: 465,
+          secure: true,
+          auth: {
+              user: 'ourtineraryintive@gmail.com',
+              pass: 'SashaB00ne'
+          }
+      });
+      let mailOptions = {
+          from: '"Andrea" ourtineraryintive@gmail.com', // sender address
+          to: req.body.to, // list of receivers
+          subject: "You have been invited to OURtinerary", // Subject line
+          text: "Your friend [insert friend] has invited you to collaborate on a trip. Follow the link below to register with OURtinerary and get to planning!", 
+          html: 
+          `<p>Hi!</p><p>Your friend ${req.body.inviter} has invited you to collaborate on a trip called ${req.body.trip}. Follow the link below to register with OURtinerary and get to planning!</p><a href="">OURtineray</a>`
+      };
+
+      transporter.sendMail(mailOptions, (error, info) => {
+          if (error) {
+              return console.log(error);
+          }
+          console.log('Message %s sent: %s', info.messageId, info.response);
+              res.status(200).end();
+          });
+      });
 
 
 

@@ -11,7 +11,7 @@ const jsonParser = bodyParser.json();
 // Post to register a new user
 router.post('/', jsonParser, (req, res) => {
   
-  const requiredFields = ['username', 'password'];
+  const requiredFields = ['username', 'password', 'email'];
   const missingField = requiredFields.find(field => !(field in req.body));
 
   if (missingField) {
@@ -23,7 +23,7 @@ router.post('/', jsonParser, (req, res) => {
     });
   }
 
-  const stringFields = ['username', 'password', 'firstName', 'lastName'];
+  const stringFields = ['username', 'password', 'firstName', 'lastName', 'email'];
   const nonStringField = stringFields.find(
     field => field in req.body && typeof req.body[field] !== 'string'
   );
@@ -38,7 +38,7 @@ router.post('/', jsonParser, (req, res) => {
   }
 
   //Check to make sure inputs dont start or end with blank spaces
-  const explicityTrimmedFields = ['username', 'password'];
+  const explicityTrimmedFields = ['username', 'password', 'email'];
   const nonTrimmedField = explicityTrimmedFields.find(
     field => req.body[field].trim() !== req.body[field]
   );
@@ -86,9 +86,10 @@ router.post('/', jsonParser, (req, res) => {
     });
   }
 
-  let {username, password, firstName = '', lastName = ''} = req.body;
+  let {username, password, email, firstName = '', lastName = ''} = req.body;
   firstName = firstName.trim();
   lastName = lastName.trim();
+  email = email.toLowerCase();
 
   return User.find({username})
     .countDocuments()
@@ -112,7 +113,8 @@ router.post('/', jsonParser, (req, res) => {
         username,
         password: hash,
         firstName,
-        lastName
+        lastName,
+        email
       });
     })
     .then(user => {
