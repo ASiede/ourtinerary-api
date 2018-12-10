@@ -476,7 +476,7 @@ app.post('/send-email', function (req, res) {
           subject: "You have been invited to OURtinerary", // Subject line
           text: "Your friend [insert friend] has invited you to collaborate on a trip. Follow the link below to register with OURtinerary and get to planning!", 
           html: 
-          `<p>Hi!</p><p>Your friend ${req.body.inviter} has invited you to collaborate on a trip called ${req.body.trip}. Follow the link below to register with OURtinerary and get to planning!</p><a href="https://stark-hamlet-54072.herokuapp.com"></a>`
+          `<p>Hi!</p><p>Your friend ${req.body.inviter} has invited you to collaborate on a trip called ${req.body.trip}. Follow the link below to register with OURtinerary and get to planning!</p><a href="https://stark-hamlet-54072.herokuapp.com">OURtinerary</a>`
       };
       transporter.sendMail(mailOptions, (error, info) => {
           if (error) {
