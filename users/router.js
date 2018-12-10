@@ -135,16 +135,6 @@ router.get('/', (req, res) => {
   return User
     .find()
     .populate('trips')
-    // .populate('trips.collaborators')
-    // .populate({
-    //   path: 'trips',
-    //   populate: {
-    //     path: 'collaborators',
-    //     model: 'User',
-    //     select: 'firstName'
-    //   }
-    // })
-    // .populate('trips.itineraryItems')
     .then(users => {
        console.log(users)
       res.json({
