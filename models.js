@@ -1,8 +1,7 @@
-"use strict"
+'use strict';
 
 const bcrypt = require('bcryptjs');
-const mongoose = require("mongoose");
-
+const mongoose = require('mongoose');
 mongoose.Promise = global.Promise;
 
 const voteSchema = mongoose.Schema({
@@ -59,22 +58,20 @@ userSchema.methods.serialize = function() {
 
 const tripSchema = mongoose.Schema({
     name: {
-      type: String,
-      required: true
+        type: String,
+        required: true
     },
     dates: {
-      type: String,
-      required: false
+        type: String,
+        required: false
     },
     location: {
-      type: String
+        type: String
     },
     tripLeader: {type: mongoose.Schema.Types.ObjectId, ref: 'User'},
     collaborators:[{type: mongoose.Schema.Types.ObjectId, ref: 'User'}],
-    // itineraryItems:[{type: mongoose.Schema.Types.ObjectId, ref: 'ItineraryItem'}]
     itineraryItems:[itineraryItemSchema]
 });
-
 
 
 tripSchema.virtual('tripLeaderUsername').get(function() {
@@ -119,10 +116,10 @@ itineraryItemSchema.methods.serialize = function() {
 
 voteSchema.methods.serialize = function() {
     return {
-      id: this._id,
-      status: this.status,
-      user: this.user,
-      itineraryItem: this.itineraryItem
+        id: this._id,
+        status: this.status,
+        user: this.user,
+        itineraryItem: this.itineraryItem
     }
 }
 
@@ -134,13 +131,9 @@ userSchema.statics.hashPassword = function(password) {
     return bcrypt.hash(password, 10);
 };
 
-
 const Trip = mongoose.model("Trip", tripSchema);
 const User = mongoose.model("User", userSchema);
 const ItineraryItem = mongoose.model("ItineraryItem", itineraryItemSchema, "itineraryItems");
 const Vote = mongoose.model("Vote", voteSchema)
 
 module.exports = { Trip, User, ItineraryItem, Vote };
-
-
-
