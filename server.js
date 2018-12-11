@@ -146,7 +146,7 @@ app.post('/trips', jsonParser, (req, res) => {
 	        	    collaborators.forEach(collaborator => {
                         User
     			        .findByIdAndUpdate(collaborator._id, { $push: {trips: trip}})
-                        .then(updatedUser => )
+                        .then(updatedUser => res.status(201).end())
                         .catch(err => {
                             console.error(err);
                             res.status(500).json({ message: 'Internal server error' });
