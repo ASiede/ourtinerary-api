@@ -403,7 +403,7 @@ app.delete('/itineraryItems/:id', (req, res) => {
     .catch(err => res.status(500).json({ message: 'Internal server error' }));    
 });
 
-//GET endpoint for votes (by id)
+//DELETE endpoint for deleting existing itinerary items (by id)
 app.get('/votes/:id', (req, res) => {
     Vote
     .findById(req.params.id)
@@ -443,7 +443,7 @@ app.put('/votes/:id', (req, res) => {
     Vote
     .findOneAndUpdate({_id: req.body.id}, toUpdate, {new: true})
     .then(vote => {
-        res.status(200).json({
+        res.status(201).json({
             id: req.body.id,
             status: req.body.status
         })

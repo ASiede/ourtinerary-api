@@ -1,3 +1,5 @@
+'use strict';
+
 const chai = require('chai');
 const chaiHttp = require('chai-http');
 const mongoose = require('mongoose');
@@ -22,24 +24,24 @@ passport.use(jwtStrategy);
 const jwtAuth = passport.authenticate('jwt', { session: false });
 
 
-// //Setting up for seeding trip data
+//Setting up for seeding trip data
 function seedTripData() {
 	console.info('seeding trip data');
 	return Trip.insertMany(seedTrips);
 }
-// //Setting up for seeding user data
+//Setting up for seeding user data
 function seedUserData() {
 	console.info('seeding user data');
 	return User.insertMany(seedUsers);
 }
 
-// //Setting up for seeding itinerary items data
+//Setting up for seeding itinerary items data
 function seedItineraryItemData() {
 	console.info('seeding itinerary item data');
 	return ItineraryItem.insertMany(seedItineraryItems);
 }
 
-// //Setting up for seeding vote data
+//Setting up for seeding vote data
 function seedVoteData() {
 	console.info('seeding vote data');
 	return Vote.insertMany(seedVotes);
@@ -75,9 +77,9 @@ describe('API', function() {
 	after(function() {
 	return closeServer();
 	});	
-// 	//GET endpoint for trips
-	describe('GET endpoint', function() {
 
+	//GET endpoint for trips
+	describe('GET endpoint', function() {
 	    it('should return all existing trips', function() {
 		    let res;
 		    return chai.request(app)
@@ -94,7 +96,6 @@ describe('API', function() {
 		        expect(res.body.trips).to.have.lengthOf(count);
 		    });
 	    });
-
 	    it('should return trips with right fields', function() {
 	    	let resTrip;
 	    	return chai.request(app)
@@ -113,15 +114,11 @@ describe('API', function() {
 	        	expect(resTrip.name).to.equal(trip.name);
 	        	expect(resTrip.dates).to.equal(trip.dates);
 	        	expect(resTrip.location).to.equal(trip.location);
-	        	// could be iimproved
 	        	expect(resTrip.tripLeader).to.be.a('string');
-	        	// could be iimproved
 	        	expect(resTrip.collaborators).to.be.a('array');
-	        	// could be iimproved
 	        	expect(resTrip.itineraryItems).to.be.a('array');
 	        });
 	    });
-
 	    it('should return the right trip when getting by id', function() {
 	    	let trip;
 	    	return Trip
@@ -141,17 +138,17 @@ describe('API', function() {
 	    });
   	});
 
-//  //POST endpoint for trips
+	//POST endpoint for trips
 	describe('POST endpoint', function() {
 	    it('should add a new trip', function() {
 	    	const userData = {"username": "Bebe", "password": "passwordpassword"}  
         	const newTrip = {
-              			name: "Beach Getaway",
-              			dates: "2/2/20-3/2/20",
-              			location: "Key West",
-              			tripLeader: "4b958af16bfe8fba53fb5fc6",
-              			collaborators: ["7b958af16bfe8fba53fb5fc6"]
-              		}
+      			name: "Beach Getaway",
+      			dates: "2/2/20-3/2/20",
+      			location: "Key West",
+      			tripLeader: "4b958af16bfe8fba53fb5fc6",
+      			collaborators: ["7b958af16bfe8fba53fb5fc6"]
+      		}
             //register new user first
 	  		return chai.request(app)
 	    	.post('/users')
@@ -175,11 +172,8 @@ describe('API', function() {
 		                    expect(res.body.name).to.equal(newTrip.name);
 		                    expect(res.body.dates).to.equal(newTrip.dates);
 		                    expect(res.body.location).to.equal(newTrip.location);
-		                    // could be improved
 		                    expect(res.body.tripLeader).to.be.a('string');
-		                    //could be improved
 		                    expect(res.body.collaborators).to.be.a('array');
-		                    //could be improved
 		                    expect(res.body.itineraryItems).to.be.a('array');
 		     				return Trip.findById(res.body.id);
 	              		})
@@ -193,7 +187,7 @@ describe('API', function() {
 	    });
   	});
 
-//  //PUT endpoint for trips
+	//PUT endpoint for trips
 	describe('PUT endpoint', function() {
 	    it('should update fields you send', function() {
 	    	const updateData = {
@@ -217,7 +211,7 @@ describe('API', function() {
 	    });
   	});   
 
-// //DELETE endpoint for trips
+	//DELETE endpoint for trips
 	describe('DELETE endpoint', function() {
     	it('delete a trip by id', function() {
 	      	let trip;
@@ -237,7 +231,97 @@ describe('API', function() {
     	});
   	});
 
-// 	//GET endpoint for users
+	//POST endpoint for new itinerary items
+	describe('POST endpoint', function() {
+	    it('should add a new itinerary item', function() {
+	    	const userData = {"username": "Bebe", "password": "passwordpassword"}  
+        	const newItineraryItem = {
+				type: "Hotel",
+      			name: "Mariot",
+      			tripId: "4c958af16bfe8fba53fb5fc6"
+      		}
+            //register new user first
+	  		return chai.request(app)
+	    	.post('/users')
+	    	.send(userData)
+	    	.then(function(res) { 		
+            	//authorize user   		
+	        	return chai.request(app)
+	            	.post('/auth/login')
+	            	.send(userData)
+	            	.then(function(res) {
+	              		return chai.request(app)
+	              		.post('/itineraryItems')
+	              		.send(newItineraryItem)
+	              		.then(function(res) {
+		                    expect(res).to.have.status(201);
+		                    expect(res).to.be.json;
+		                    expect(res.body).to.be.a('object');
+		                    expect(res.body).to.include.keys(
+		                      'type', 'name');
+		                    expect(res.body.id).to.not.be.null;
+		                    expect(res.body.type).to.equal(newItineraryItem.type);
+		                    expect(res.body.name).to.equal(newItineraryItem.name);
+		     				return ItineraryItem.findById(res.body.id);
+	              		})
+		                .then(function(ItineraryItem) {
+		                    expect(ItineraryItem.name).to.equal(newItineraryItem.name);
+		                    expect(ItineraryItem.type).to.equal(newItineraryItem.type);
+		                
+	          			})
+	        		})  
+	        }); 		   
+	    });
+  	});
+
+	//GET endpoint for getting votes (by id)
+	describe('GET endpoint', function() {
+	    it('should return the right vote when getting by id', function() {
+	    	let vote;
+	    	return Vote
+	    		.findOne()
+	    		.then(function(_vote) {
+	    			vote = _vote;
+	    			return chai.request(app).get(`/votes/${vote.id}`);
+	    		})
+	    		.then(function(res) {
+	    			expect(res).to.have.status(200);
+	        		expect(res).to.be.json;
+	        		return Vote.findById(vote.id)
+	    		})
+	    		.then(function(_vote) {
+	    			expect(_vote.id).to.equal(vote.id)
+	    		}) 
+	    });
+  	});
+
+	//PUT endpoint for updating votes (by id)
+	describe('PUT endpoint', function() {
+	    it('should update vote status', function() {
+	    	const updateVote = {
+	    		id: '4b858af16bfe8fba53fb5ac6',
+	        	status: 'No'
+	      	};
+	      	return chai.request(app)
+	        .get(`/votes/${updateVote.id}`)
+	        .then(function(res) {
+	        	updateVote.id = res.body.id
+	        	return chai.request(app)
+	            .put(`/votes/${res.body.id}`)
+	            .send(updateVote);
+	        })
+	        .then(function(res) {
+	        	expect(res).to.have.status(201);
+	        	return Vote.findById(updateVote.id);
+	        })
+	        .then(function(vote) {
+	        	expect(vote.status).to.equal(updateVote.status);
+	        });
+	    });
+  	}); 
+
+
+	//GET endpoint for users
  	describe('GET endpoint', function() {
  		it('should return all users', function() {
  			let res;
@@ -271,7 +355,7 @@ describe('API', function() {
 	    });
  	});
  	
-// 	//POST endpoint for users
+	//POST endpoint for users
 	describe('POST endpoint', function() {
     	it('should add a new user', function() {
       		const userData = {"username": "JDoe", "password": "passwordpassword","email": "emai@email.com", "firsName": "John", "lastName": "Doe"}
@@ -287,24 +371,5 @@ describe('API', function() {
       		});
     	});
   	});
-
-// 	//POST endpoint for authorization of users login
-	// describe('POST endpoint', function() {
- //    	it('should log in an existing user', function() {
- //      		//register new user first
-	//       	const userData = {"username": "Rupaul", "password": "passwordpassword"}
-	//   		return chai.request(app)
-	//     	.post('/users')
-	//     	.send(userData)
-	//     	.then(function(res) {
-	//        		return chai.request(app)
-	//         	.post('/auth/login/')
-	//         	.send(userData)
-	//         	.then(function(res) {
-	//             	expect(res).to.have.status(200);
-	//           	})
-	//     	});
- //    	});
- //  	});
 });  	
 
